@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import tornado.ioloop
 from tornado.websocket import websocket_connect
 
 

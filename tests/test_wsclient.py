@@ -15,7 +15,6 @@ define('username', default='test1', type=str)
 define('password', default='1111', type=str)
 define('token', default='', type=str)
 
-
 keepRunning = True
 fishClient = None
 
