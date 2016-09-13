@@ -132,7 +132,8 @@ class WSHandler(WSBaseHandler):
         pbdata = dict(errno=errno, errmsg=errmsg)
         self.write_message(pbdata, binary=True)
 
-    def send_message(self, message, uids=None):
+    @staticmethod
+    def send_message(message, uids=None):
         """发送消息
         """
         CLIENTS = WSHandler.CLIENTS

@@ -2,9 +2,9 @@
 
 import time
 import tornado.ioloop
-from apps.fight.table import FishTables
-from apps.fight.player import FishPlayer
 from handlers import WSHandler
+from apps.fight.table import Tables
+from apps.fight.player import Player
 
 
 class GameGlobal(object):
@@ -35,7 +35,7 @@ class FishFightGame(object):
     def __init__(self):
         GameGlobal.init()
         self.players = {}
-        self.tables = FishTables()
+        self.tables = Tables()
 
     def __del__(self):
         print 'fishfightgame del'
@@ -56,7 +56,7 @@ class FishFightGame(object):
             if uid in self.players:
                 print 'duplicated player uid=%s' % uid
                 return
-            p = FishPlayer.load_by_uid(uid)
+            p = Player.load_by_uid(uid)
             if not p:
                 print 'fail to load player uid=%s' % uid
                 return
@@ -88,5 +88,3 @@ class FishFightGame(object):
     def handle_gm_commond(self, commond):
         # 系统管理指令， 由外部管理接口传入
         pass
-
-            return
