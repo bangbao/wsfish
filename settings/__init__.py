@@ -14,21 +14,10 @@ SEND_LOG_TO_REYUN = False # 是否发送日志给reyun
 AD_CLICK_CALLBACK = False  # 是否需要广告回调
 
 ADMINS = (
-    #'chanrong.niu@kaiqigu.com',
-    #'yiwei.zhang@kaiqigu.com',
-    #'haoran.di@kaiqigu.com',
-    #'shuoquan.man@kaiqigu.com',
-    #'chenguang.li@kaiqigu.com',
-    'yanwei.zhang@kaiqigu.com',
-    #'chanrong.niu@kaiqigu.com',
     'basketball_error@126.com',
 )
 # 客户端报错邮件接收人
 CLIENT_DEVELOP = (
-    #'chanrong.niu@kaiqigu.com',
-    #'shuoquan.man@kaiqigu.com',
-    #'shuai.zhang@kaiqigu.com',
-    #'basketball_error@126.com',
     'basketball_client@126.com',
 )
 DEFAULT_ADMIN_MANAGER = (
@@ -106,6 +95,7 @@ PAYMENT_WARESID_MAP = {
                 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13},
 }
 
+PROJECT_NAME = 'wsapp'
 BASE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 LOGS_ROOT = os.path.join(BASE_ROOT, 'logs')
 TEMPLATE_ROOT = os.path.join(BASE_ROOT, 'templates')
