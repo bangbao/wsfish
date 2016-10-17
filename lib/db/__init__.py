@@ -48,30 +48,6 @@ def make_redis_client(redis_config):
 cache = make_redis_client(settings.DATABASES['redis'])
 
 
-def dict_diff(old, new):
-    """# dict_diff: 比较两个字典
-    args:
-        old, new:    ---    arg
-    returns:
-        0    ---
-    """
-    old_keys = set(old.keys())
-    new_keys = set(new.keys())
-
-    remove_keys = old_keys - new_keys       # 要被删除的key
-    add_keys = new_keys - old_keys          # 要添加的key
-    same_keys = new_keys & old_keys         # 新旧共同拥有的key，这个是用来准备做比较修改
-
-    update = {}
-
-    for k in same_keys:
-        new_data = new[k]
-        if old[k] != new_data:
-            update[k] = new_data
-    for k in add_keys:
-        update[k] = new[k]
-    return update, remove_keys
-
 class ModelTools(object):
     """# ModelTools: 一堆工具"""
     DATABASE_NAME = 'servers'
