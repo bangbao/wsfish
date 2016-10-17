@@ -7,8 +7,6 @@ from lib.db import ModelBase
 class Config(ModelBase):
     """Config: 游戏配置的模型
     """
-    DATABASE_NAME = 'master'
-
     def __init__(self, uid=None):
         self.uid = uid
         self._attrs = {

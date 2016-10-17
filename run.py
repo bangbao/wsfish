@@ -25,7 +25,7 @@ options.parse_command_line()
 # 设定进程使用的配置文件
 import settings
 settings.set_env(options.env_name)
-from handlers import WSHandler
+from handlers import WSHandler, AdminHandler
 from threads import AuthThread, GameThread, UserLogin
 from apps.config import game_config
 
@@ -34,6 +34,7 @@ class Application(tornado.web.Application):
     def __init__(self, debug=False, settings=None):
         handlers = [
             (r"/ws/", WSHandler),
+            (r"/admin/(.*)", AdminHandler),
         ]
         super(Application, self).__init__(handlers, debug=debug)
 

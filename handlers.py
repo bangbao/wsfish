@@ -150,4 +150,42 @@ class WSHandler(WSBaseHandler):
                     handler.write_message(message)
 
 
-        self.write_message(message, binary)
+
+class AdminHandler(tornado.web.RequestHandler):
+    """ 后台统一 Handler
+    全部后台处理公共接口
+    """
+    def initialize(self):
+        """ 初始化操作
+        创建全局环境和运行环境
+        """
+        self.logger = None
+
+    def get_current_user(self, *args):
+        """获取当前登陆用户对象
+        """
+        return admin_app.auth.get_admin_by_request(self)
+
+    def render_to_response(self):
+        """ 渲染模板
+        """
+        template_data = gate.admin_response(self.env)
+        if isinstance(template_data, basestring):
+            # 若返回字符串，标识报错了。直接写出错误
+            self.write(template_data)
+            self.set_header('Content-Type', 'text/plain')
+        elif template_data and template_data[0]:
+            self.render(template_data[0], **template_data[1])
+
+    @tornado.web.addslash
+    def get(self):
+        """ 处理GET请求
+        """
+        self.render_to_response()
+
+    @tornado.web.addslash
+    def post(self):
+        """ 处理POST请求
+        """
+        self.render_to_response()
+

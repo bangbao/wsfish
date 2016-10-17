@@ -47,4 +47,5 @@ DATABASES = {
     'subrecord'       : dict(MYSQL_DEFAULT, table_prefix='subrecord'),    # 消费数据
     'subrecord_money' : dict(MYSQL_DEFAULT, table_prefix='subrecord_money'),    # money消费数据
     'servers'         : SERVERS,                      # 用户游戏分服数据
+    'mongo'           : dict(host='127.0.0.1', port=27017, db='wsfish'),
 }

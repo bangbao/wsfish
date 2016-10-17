@@ -4,7 +4,7 @@ import time
 import threading
 import Queue
 import tornado.ioloop
-from apps.fight.base import FishFightGame
+from apps.fight.game import FishFightGame
 
 
 class UserLogin(object):

@@ -59,8 +59,6 @@ class ModelBase(object):
         return o
 
     def save(self):
-        if not self.changed:
-            return
         if self.need_insert:
             r = {'_id': self.uid}
             for k in self._attrs_base:
