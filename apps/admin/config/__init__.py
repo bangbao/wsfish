@@ -5,7 +5,7 @@ import time
 
 import settings
 from apps.config import game_config
-from apps.config import import_file
+from apps.config import consts as config_consts
 from . import consts
 
 
@@ -13,7 +13,7 @@ def index(req, config_key=None, msg=''):
     """显示配置相关信息
     """
     field = req.get_argument('field', 'index')
-    config_name_list = sorted([i for i in game_config.config_name_list if i[2]])
+    config_name_list = config_consts.CONFIG_LIST
 
     config_name_list_new = []
     l_len = len(config_name_list)
@@ -29,8 +29,7 @@ def index(req, config_key=None, msg=''):
         i+=1
 
     config_key = config_key or req.get_argument('config_key', config_name_list[0][0])
-    config_cns = [i[4] for i in config_name_list if i[0] == config_key]
-    config_cn = config_cns[0] if config_cns else config_key
+    config_cn = config_key
 
     return 'admin/config/index.html', {
         'config_name_list': config_name_list_new,
@@ -38,7 +37,7 @@ def index(req, config_key=None, msg=''):
         'config_cn': config_cn,
         'config_data': getattr(game_config, config_key, {}),
         'config_versions': game_config.config_versions,
-        'config_update_ats': game_config.config_update_ats,
+        'config_update_ats': game_config.client_config_versions,
         'msg': msg,
         'user_field': consts.USER_FIELDS,
         'field': field,

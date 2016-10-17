@@ -31,12 +31,13 @@ from apps.config import game_config
 
 
 class Application(tornado.web.Application):
-    def __init__(self, debug=False, settings=None):
+    def __init__(self, debug=False):
         handlers = [
             (r"/ws/", WSHandler),
-            (r"/admin/(.*)", AdminHandler),
+            (r"/admin/.*", AdminHandler),
         ]
-        super(Application, self).__init__(handlers, debug=debug)
+        super(Application, self).__init__(handlers, debug=debug,
+                                          **settings.TORNADO_SETTINGS)
 
         self.auth_thread = AuthThread()
         self.auth_thread.start()

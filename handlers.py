@@ -2,6 +2,8 @@
 
 import tornado.ioloop
 from tornado.websocket import WebSocketHandler
+from apps import gate
+from apps.admin import auth as admin_auth
 
 
 CONNECTION_STATUS_CLOSED = 0
@@ -161,15 +163,17 @@ class AdminHandler(tornado.web.RequestHandler):
         """
         self.logger = None
 
-    def get_current_user(self, *args):
+    def get_current_user(self):
         """获取当前登陆用户对象
         """
-        return admin_app.auth.get_admin_by_request(self)
+        return admin_auth.get_admin_by_request(self)
 
     def render_to_response(self):
         """ 渲染模板
         """
-        template_data = gate.admin_response(self.env)
+        self.req = self
+        self.user = self.get_current_user()
+        template_data = gate.admin_response(self)
         if isinstance(template_data, basestring):
             # 若返回字符串，标识报错了。直接写出错误
             self.write(template_data)

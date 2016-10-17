@@ -7,8 +7,6 @@ import random
 import cPickle as pickle
 
 import settings
-from apps import arena as arena_app
-from apps import gamevs as gamevs_app
 from apps.config import game_config
 from apps.user import consts as user_consts
 from apps.user.models import TokenServerUid, OnlineRank, RegistRank, get_redis_userd_memory

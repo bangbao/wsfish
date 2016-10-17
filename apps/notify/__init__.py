@@ -4,7 +4,6 @@ import datetime
 
 import settings
 from apps.config import game_config
-from apps.public import celebration as pub_celebration
 from apps.public import consts as pub_consts
 from . import consts
 
@@ -303,64 +302,3 @@ def notify_by_sort20(user, kwargs):
         gift = config['reward']
 
     user.notify.add_message(user.NOTIFY_FROM_ACTIVE_XSJX, title, content, gift)
-
-
-def push_notification_celeyao():
-    """姚餐厅时间开始，提前1分钟
-    """
-    from apps.platform import jpush
-
-    if not settings.PUSH_NOTIFICATION:
-        print 'settings.PUSH_NOTIFICATION is empty'
-        return
-
-    now = datetime.datetime.now()
-    if now.hour <= 14:
-        content = get_notify_content(consts.PUSH_NOTIFICATION_CELEYAO_LUNCH)
-    else:
-        content = get_notify_content(consts.PUSH_NOTIFICATION_CELEYAO_DINNER)
-
-    # 有效1.5小时
-    time_to_live = 1.5 * 3600
-    result = jpush.send_notification(content, audience='all', time_to_live=time_to_live)
-    if result:
-        print 'push_notification_celeyao succes'
-    else:
-        print 'push_notification_celeyao failure'
-
-
-def push_notification_pve_ranking():
-    """PvE好友排行结算排名结算时间到了的前1小时
-    """
-    from apps.platform import jpush
-
-    if not settings.PUSH_NOTIFICATION:
-        print 'settings.PUSH_NOTIFICATION is empty'
-        return
-
-    tag = []
-    now = datetime.datetime.now()
-    today = now.strftime('%Y-%m-%d %H:%M:%S')
-    for server_id, obj in game_config.yield_open_servers():
-        if obj['open_time'] < today:
-            season_conf = pub_celebration.get_season_conf(server_id)
-            stime, etime = pub_celebration.get_activity_datetime(season_conf['cid'], now)
-            # 只在最后一天才发推送
-            if now.date() == etime.date():
-                tag.append(server_id)
-
-    if not tag:
-        print 'push_notification_pve_ranking failure: no server tag'
-        return
-
-    content = get_notify_content(consts.PUSH_NOTIFICATION_CELEYAO_LUNCH)
-    # 有效1小时
-    time_to_live = 3500
-    # TODO不支持tag, 所以暂时全部发
-    tag = None
-    result = jpush.send_notification(content, tag=tag, time_to_live=time_to_live)
-    if result:
-        print 'push_notification_pve_ranking success: %s' % tag
-    else:
-        print 'push_notification_pve_ranking failure: %s' % tag
-
