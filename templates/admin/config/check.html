@@ -1,0 +1,35 @@
+{% extends "field.html" %}
+
+
+{% block fieldbody %}
+
+{% if not content %}
+    <div style="font-size:14px;">
+            &nbsp;&nbsp;&nbsp;&nbsp;<big>大哥真厉害，全部正确呦！！</big>
+    </div>
+{% else %}
+    <table id="data">
+        <thead>
+        <tr width="60px">
+            <th>配置名</th>
+            <th>配置ID</th>
+            <th>错误字段</th>
+            <th>错误值</th>
+            <th>扩展(索引配置名或者消息)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i, obj in enumerate(content) %}
+        <tr onmouseover="return changecolor(this, '#B3D9D9')" onmouseout="return changecolor(this, '')"  bgcolor="cornsilk">
+            <td id="name">{{ obj['name'] }}</td>
+            <td id="cfg_id">{{ obj['cfg_id'] }}</td>
+            <td id="error_key">{{ obj['error_key'] }}</td>
+            <td id="error_value">{{ obj['error_value'] }}</td>
+            <td id="error_ext">{{ obj['error_ext'] }}</td>
+        </tr>
+        {% end %}
+        </tbody>
+    </table>
+{% end %}
+
+{% end %}

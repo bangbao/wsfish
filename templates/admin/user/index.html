@@ -1,0 +1,142 @@
+{% extends "user_field.html" %}
+
+{% block fieldbody %}
+
+<form action="{{ get_url('/admin/user/export/') }}" method="get">
+    <input type="hidden" name="export_uid" value="{{ user.uid }}" />
+    <button class="reset" type="submit" name="reset" value="True" onclick="return confirm('确定导出吗？')">导出用户数据</button>
+</form>
+
+<div id="uid_inject">
+    <form action="{{ get_url('/admin/user/inject/') }}" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="inject_uid" value="{{ user.uid }}" />
+    <button class="reset" type="submit" name="reset" value="True" onclick="return confirm('确定导入吗？')">导入用户数据</button>
+    <input type="file" name="user_file"/>
+    </form>
+</div>
+
+<table>
+    <tr>
+    <td><form action="{{ get_url('/admin/user/skip_guide/') }}" method="get">
+        新手引导:
+        <input type="hidden" name="uid" value="{{ user.uid }}"/>
+          <select name="step" value="">
+          {% for cfg_id, obj in sorted(game_config.guide_raw.iteritems()) %}
+          <option value="{{ cfg_id }}">{{ obj['guidegroup'] }} -- {{ cfg_id }} -- {{ obj['save'] }}</option>
+          {% end %}
+          </select>
+        <button type="submit" name="goto" value="True" onclick="return confirm('确定吗？')">跳到指定步骤</button>
+    </form></td>
+    <td><form action="{{ get_url('/admin/user/skip_guide/') }}" method="get">
+        <input type="hidden" name="uid" value="{{ user.uid }}"/>
+        <button type="submit" name="skip" value="True" onclick="return confirm('确定跳过吗？')">跳过全部</button>
+    </form></td>
+    </tr>
+    <tr>
+    <td><form action="{{ get_url('/admin/user/ban_user/') }}" method="get">
+        是否封号:
+        <input type="hidden" name="uid" value="{{ user.uid }}"/>
+          <select name="is_ban" value="">
+          {% if user.user_m.is_ban %}
+          <option value="0"> 0 -- 未封号</option>
+          <option value="1" selected> 1 -- 已封号</option>
+          {% else %}
+          <option value="0"> 0 -- 未封号</option>
+          <option value="1"> 1 -- 已封号</option>
+          {% end %}
+          </select>
+        <button type="submit" name="goto" value="True" onclick="return confirm('确定吗？')">修改</button>
+    </form></td>
+    </tr>
+</table>
+
+<form action="{{ get_url('/admin/user/modify/') }}" method="get">
+    <table id="mindata">
+        <tr>
+            <td>LOGO(logo)</td>
+            <td>{{ user.user_m.logo }}--{{ game_config.logo[user.user_m.logo]['name'] }}--{{ game_config.logo[user.user_m.logo]['zonename'] }}</td>
+        </tr>
+        <tr><td>昵称(username)</td>
+            <td><input type="text" name="username" value="{{ user.user_m.username }}" /></td>
+        </tr>
+        <tr>
+            <td title="等级上限: {{ max(game_config.user_info) }}">等级(level)</td>
+            <td><input type="number" max="{{ max(game_config.user_info) }}" name="level" value="{{ user.user_m.level }}" min="1" /></td>
+        </tr>
+        <tr>
+            <td>经验(exp)</td>
+            <td><input type="number" name="exp" value="{{ user.user_m.exp }}" min="0" /></td>
+        </tr>
+        <tr>
+            <td>VIP等级(vip)</td>
+            <td><input type="number" max="{{ max(game_config.vip_function )}}" name="vip" value="{{ user.user_m.vip }}" min="0" /></td>
+        </tr>
+        <tr>
+            <td>VIP经验(vip_exp)</td>
+            <td><input type="number" name="vip_exp" value="{{ user.user_m.vip_exp }}" min="0" /></td>
+        </tr>
+        <tr>
+            <td>钻石(coin)</td>
+            <td><input type="number" name="coin" value="{{ user.user_m.coin }}"  min="0" /></td>
+        </tr>
+        <tr>
+            <td>金钱(money)</td>
+            <td><input type="number" name="money" value="{{ user.user_m.money }}" min="0" /></td>
+        </tr>
+        <tr>
+            <td>荣誉点(honor)</td>
+            <td><input type="number" name="honor" value="{{ user.user_m.honor }}" min="0" /></td>
+        </tr>
+        <tr>
+            <td>积分(point)</td>
+            <td><input type="number" name="point" value="{{ user.user_m.point }}" min="0" /></td>
+        </tr>
+        <tr>
+            <td title="行动力上限: {{ user.user_m.get_energy_top() }}">行动力(energy)</td>
+            <td><input type="number" name="energy" value="{{ user.user_m.energy }}" min="0" /></td>
+        </tr>
+        <tr>
+            <td title="战力上限: {{ user.user_m.get_battle_top() }}">战力(battle)</td>
+            <td><input type="number" name="battle" value="{{ user.user_m.battle }}" min="0" /></td>
+        </tr>
+        <tr>
+            <td>注册时间点</td>
+            <td>{{ tformat(user.user_m.regist_time) }}</td>
+        </tr>
+        <tr>
+            <td>活跃时间点</td>
+            <td>{{ tformat(user.user_m.active_time) }}</td>
+        </tr>
+        <tr>
+            <td>精力时间点</td>
+            <td>{{ tformat(user.user_m.energy_fill_at) }}</td>
+        </tr>
+        <tr>
+            <td>战力时间点</td>
+            <td>{{ tformat(user.user_m.battle_fill_at) }}</td>
+        </tr>
+        <tr>
+            <td>累计登录天数</td>
+            <td>{{ len(user.user_m.login_days) }}</td>
+        </tr>
+        <tr>
+            <td>连续登录天数</td>
+            <td>{{ len(user.user_m.continue_days) }}</td>
+        </tr>
+        <tr>
+            <td>钻石获得来源</td>
+            <td>{{ user.user_m.coin_type }}</td>
+        </tr>
+        <tr>
+            <td>新手引导记录</td>
+            <td>{{ user.user_m.guide }}</td>
+        </tr>
+        <tr>
+            <td>消费次数记录</td>
+            <td>{{ user.user_m.expense }}</td>
+        </tr>
+    </table>
+    <input type="hidden" name="uid" value="{{ user.uid }}"/>
+    <button type="submit" name="save" value="True" onclick="return confirm('确定保存吗？')">保存</button>
+</form>
+{% end %}

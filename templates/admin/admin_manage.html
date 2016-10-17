@@ -1,0 +1,48 @@
+<body>
+<div style="font-size:12px;color:red">
+    {% if msg %}
+      {{ escape(msg) }}
+    {% end %}
+</div>
+
+<p>您的账号：{{ admin.username }} </p>
+<form method="post" action="{{ get_url('/admin/admin_manage/') }}" autocomplete="off">
+    <input type="hidden" name="mid" value="{{ admin.username }}">
+<p> 用户权限</p>
+<ul>
+    <li> 超级权限 --
+        <input type="radio" name="super" value="{{ consts.PERM_NONE }}" checked id="super_perm0">
+        <label for="super_perm0">无权限，</label>
+        {% if admin.get_permission('super') %}
+        <input type="radio" name="super" value="{{ consts.PERM_READ_WRITE }}" checked id="super_perm1">
+        {% else %}
+        <input type="radio" name="super" value="{{ consts.PERM_READ_WRITE }}" id="super_perm1">
+        {% end %}
+        <label for="super_perm1">有权限</label>
+   </li>
+   <br>
+    {% for href in consts.LEFT_HREF %}
+        {% if consts.URL_SETTINGS[href][2] %}
+        <li>{{ consts.URL_SETTINGS[href][1] }} --
+
+            <input type="radio" name="{{ consts.URL_SETTINGS[href][2] }}" value="{{ consts.PERM_NONE }}" checked id="{{ href }}_perm0">
+            <label for="{{ href }}_perm0">无权限，</label>
+            {% if admin.get_permission(consts.URL_SETTINGS[href][2]) == consts.PERM_READ %}
+            <input type="radio" name="{{ consts.URL_SETTINGS[href][2] }}" value="{{ consts.PERM_READ }}" checked id="{{ href }}_perm1">
+            {% else %}
+            <input type="radio" name="{{ consts.URL_SETTINGS[href][2] }}" value="{{ consts.PERM_READ }}" id="{{ href }}_perm1">
+            {% end %}
+            <label for="{{ href }}_perm1">只读权限，</label>
+            {% if admin.get_permission(consts.URL_SETTINGS[href][2]) == consts.PERM_READ_WRITE %}
+            <input type="radio" name="{{ consts.URL_SETTINGS[href][2] }}" value="{{ consts.PERM_READ_WRITE }}" checked id="{{ href }}_perm2">
+            {% else %}
+            <input type="radio" name="{{ consts.URL_SETTINGS[href][2] }}" value="{{ consts.PERM_READ_WRITE }}" id="{{ href }}_perm2">
+            {% end %}
+            <label for="{{ href }}_perm2">修改权限</label>
+        </li>
+        {% end %}
+    {% end %}
+</ul>
+<input type="submit" name="submit"  value="提交" />
+</form>
+</body>

@@ -1,0 +1,105 @@
+<head>
+<style type="text/css">
+    #mindata{border-collapse:collapse;font-size:12px;}
+    #mindata td{width:100px;padding:3px;font-size:12px;}
+</style>
+
+</head>
+<body >
+<div style="font-size:12px;color:red">
+    {% if msg %}
+      {{ escape(msg) }}
+    {% end %}
+</div>
+<form action="{{ get_url('/admin/admin_add/') }}" method="post" onsubmit="return chk()">
+<table id="mindata">
+    <tr>
+        <td>帐号：</td>
+        <td><input type="text" id="username" name="username" /></td>
+    </tr>
+    <tr>
+        <td>密码：</td>
+        <td><input type="password" id="password" name="password"></td>
+    </tr>
+    <tr>
+        <td>确认密码：</td>
+        <td><input type="password" id="password1" name="password1"></td>
+    </tr>
+    <tr>
+        <td>邮件地址: </td>
+        <td><input type="email" id="email" name="email"></td>
+    </tr>
+</table>
+<p> 用户权限</p>
+<ul>
+    <li> 超级权限 --
+        <input type="radio" name="super" value="{{ consts.PERM_NONE }}" checked checked id="super_perm0">
+        <label for="super_perm0">无权限，</label>
+        <input type="radio" name="super" value="{{ consts.PERM_READ_WRITE }}" id="super_perm1">
+        <label for="super_perm1">有权限</label>
+   </li>
+   <br>
+    {% for href in consts.LEFT_HREF %}
+        {% if consts.URL_SETTINGS[href][2] %}
+        <li>{{ consts.URL_SETTINGS[href][1] }} --
+            <input type="radio" name="{{ consts.URL_SETTINGS[href][2] }}" value="{{ consts.PERM_NONE }}" checked id="{{ href }}_perm0">
+            <label for="{{ href }}_perm0">无权限，</label>
+            <input type="radio" name="{{ consts.URL_SETTINGS[href][2] }}" value="{{ consts.PERM_READ }}" id="{{ href }}_perm1">
+            <label for="{{ href }}_perm1">只读权限，</label>
+            <input type="radio" name="{{ consts.URL_SETTINGS[href][2] }}" value="{{ consts.PERM_READ_WRITE }}" id="{{ href }}_perm2">
+            <label for="{{ href }}_perm2">修改权限</label>
+        </li>
+        {% end %}
+    {% end %}
+</ul>
+<input type="submit" name="submit"  value="注册" />
+</form>
+
+<script type="javascript">
+function clear_cache(){
+    var nameObj = document.getElementById('username');
+    var pwdObj = document.getElementById('password');
+    nameObj.value = '';
+    pwdObj.value = '';
+}
+clear_cache();
+
+function chk(){
+    var nameObj = document.getElementById('username');
+    if (nameObj.value.length==0){
+        alert("请输入帐号！");
+        nameObj.focus();
+        return false;
+    }
+
+    var pwdObj = document.getElementById('password');
+    var pwdObj1 = document.getElementById('password1');
+    if (!pwdObj.value){
+        alert("密码不能为空");
+        pwdObj.value = '';
+        pwdObj1.value = '';
+        pwdObj.focus();
+        return false;
+    }
+    if (pwdObj.value != pwdObj1.value){
+        alert("前后密码不一致, 请重新输入");
+        pwdObj.value = '';
+        pwdObj1.value = '';
+        pwdObj.focus();
+        return false;
+    }
+
+    var emailObj = document.getElementById('email');
+　　var Regex = /^(?:\w+\.?)*\w+@(?:\w+\.)*\w+$/;
+　　if (!Regex.test(emailObj.value)){
+    　　alert("请输入有效的email地址");
+        emailObj.value = "";
+        emailObj.focus();
+    　　return false;
+　　}
+
+    return true;
+}
+  </script>
+
+</body>

@@ -1,0 +1,39 @@
+{% extends "user_field.html" %}
+
+{% block fieldbody %}
+
+<p>分服用户数据：(共{{ len(users) }}个)</p>
+<table id="data">
+    <tr>
+        <th width="60px">UID</th>
+        <th>TOKEN(token)</th>
+        <th>SERVER(server_id)</th>
+        <th>昵称(name)</th>
+        <th>级别(level)</th>
+        <th>经验(exp)</th>
+        <th>钻石(coin)</th>
+        <th>金币(money)</th>
+        <th>排名(arena)</th>
+        <th>注册时间</th>
+        <th>活跃时间</th>
+        <th>操作(reset)</th>
+    </tr>
+    {% for u in users %}
+    <tr onmouseover="return changecolor(this, '#B3D9D9')" onmouseout="return changecolor(this, '')">
+        <td id="uid"><a href="{{ get_url('/admin/user/show/?uid='+u.uid) }}" target="main" title="查看用户详细">{{ u.uid }}</a></td>
+        <td id="token">{{ u.user_m.token }}</td>
+        <td id="server_id">{{ u.server_id }}--{{ game_config.servers[u.server_id]['server_name'] }}</td>
+        <td id="username">{{ u.user_m.username }}</td>
+        <td id="level" title="等级">{{ u.user_m.level }}</td>
+        <td id="exp" title="经验">{{ u.user_m.exp }}</td>
+        <td id="coin" title="钻石">{{ u.user_m.coin }}</td>
+        <td id="money" title="金钱">{{ u.user_m.money }}</td>
+        <td id="arena" title="0表示没进入竞技场">{{ u.user_m.arena_rank }}</td>
+        <td id="regist_time" title="注册时间">{{ tformat(u.user_m.regist_time) }}</td>
+        <td id="active_time" title="最后活跃时间">{{ tformat(u.user_m.active_time) }}</td>
+        <td><a id="reset_link" href="{{ get_url('/admin/user_reset/?uid=%s&server_id=%s' % (u.uid, u.server_id)) }}&redirect={{ get_url(handler.request.path+'?user_token='+u.user_m.token) }}" target="main" onclick="return confirm('确定清除吗？')">清除所有数据</a></td>
+    </tr>
+    {% end %}
+</table>
+
+{% end %}

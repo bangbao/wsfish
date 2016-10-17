@@ -1,0 +1,139 @@
+<head>
+<style type="text/css">
+    #data{border-collapse:collapse;border:1px solid #BEBEBE;font-size:12px;}
+    #data th{background:#BEBEBE;border-bottom:1px solid #BEBEBE;line-height:24px;
+            font-weight:lighter;padding:4px;text-align:center}
+    #data td{border:1px solid #BEBEBE;padding:4px;text-align:center;font-size:12px}
+    .link{font-size:11px;}
+    #reset_link{font-size:11px;color:red}
+</style>
+</head>
+
+<body>
+<h3>查询用户信息</h3>
+<div style="font-size:12px;color:red">
+    {% if msg %}
+      {{ escape(msg) }}
+    {% end %}
+</div>
+<hr>
+<table>
+<tr>
+    <td>
+    <form action="{{ get_url('/admin/user/show/') }}" method="get">
+        用户userid:&nbsp;&nbsp;<input type="text" name="uid"/>&nbsp;&nbsp;<button type="submit">查询</button><br/>
+    </form>
+    </td>
+</tr>
+
+<tr>
+    <td>
+    <form action="{{ get_url('/admin/user_token/show/') }}" method="get">
+        user_token:&nbsp;&nbsp;<input type="text" name="user_token"/>&nbsp;&nbsp;<button type="submit">查询</button><br/>
+    </form>
+    </td>
+</tr>
+
+<tr>
+    <td>
+    <form action="{{ get_url('/admin/username/show/') }}" method="get">
+        服务器:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <select name="server_id" value="">
+            {% for server_id, obj in sorted(game_config.yield_open_servers(), reverse=True) %}
+                <option value="{{ obj['server_id'] }}">{{ obj['server_name'] }}({{ obj['server_id'] }})</option>
+            {% end %}
+        </select><br/>
+        用户昵称:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="username"/>&nbsp;&nbsp;<button type="submit">查询</button><br/>
+    </form>
+    </td>
+</tr>
+</table>
+<hr>
+<p></p>
+
+<form action="{{ get_url('/admin/user_all/') }}" method="get">
+<table id="data">
+<tr>
+    <td>
+        分服排行查询:&nbsp;&nbsp;
+        <select name="server_id" value="01">
+            {% for server_id, obj in sorted(game_config.yield_open_servers(), reverse=True) %}
+            {% if server_id == select_server %}
+                <option value="{{ obj['server_id'] }}" selected>{{ obj['server_name'] }}({{ obj['server_id'] }})</option>
+            {% else %}
+                <option value="{{ obj['server_id'] }}">{{ obj['server_name'] }}({{ obj['server_id'] }})</option>
+            {% end %}
+            {% end %}
+        </select>
+    </td>
+    <td>
+        类型:
+        <select name="sort" value="1">
+            {% set rank_sorts = [('exp', u'等级排行'), ('ability', u'实力排行')] %}
+            {% for sort, name in rank_sorts %}
+            {% if sort == select_sort %}
+                <option value="{{ sort }}" selected>{{ name }}</option>
+            {% else %}
+                <option value="{{ sort }}">{{ name }}</option>
+                {% end %}
+            {% end %}
+        </select>
+    </td>
+    <td>
+        页数:(每页默认显示50个)
+        <select name="page" value="1">
+            {% for i in xrange(1, 101) %}
+                {% if i == select_page %}
+                <option value="{{ i }}" selected>{{ i }}</option>
+                {% else %}
+                <option value="{{ i }}">{{ i }}</option>
+                {% end %}
+            {% end %}
+        </select>
+    </td>
+    <td><button type="submit" style="color: red;">查询</button></td>
+    <td><button type="submit" name="next_page" value="{{ select_page + 1 }}">下一页</button></td>
+</tr>
+</table>
+</form>
+
+<table id="data">
+    <tr>
+        <th>排行</th>
+        <th width="60px">UID</th>
+        <th>TOKEN(token)</th>
+        <th>昵称(name)</th>
+        <th>级别(level)</th>
+        <th>经验(exp)</th>
+        <th>钻石(coin)</th>
+        <th>金币(money)</th>
+        <th>排名(arena)</th>
+        <th>实力(ability)</th>
+        <th>注册时间</th>
+        <th>登录时间</th>
+        <th>活跃时间</th>
+    </tr>
+    {% for rank, user in users %}
+    <tr onmouseover="return changecolor(this, '#B3D9D9')" onmouseout="return changecolor(this, '')">
+        <td id="num" title="序号">{{ rank }}</td>
+        <td id="uid"><a href="{{ get_url('/admin/user/show/?uid=') }}{{ user.uid }}" target="main" title="查看用户详细">{{ user.uid }}</a></td>
+        <td id="token" title="TOKEN: {{ user.user_m.token }}">{{ user.user_m.token }}</td>
+        <td id="username" title="TOKEN: {{ user.user_m.token }}">{{ user.user_m.username }}</td>
+        <td id="level" title="等级">{{ user.user_m.level }}</td>
+        <td id="exp" title="经验">{{ user.user_m.exp }}</td>
+        <td id="coin" title="钻石">{{ user.user_m.coin }}</td>
+        <td id="money" title="金钱">{{ user.user_m.money }}</td>
+        <td id="arena" title="0表示没进入竞技场">{{ user.user_m.arena_rank }}</td>
+        <td id="ability" title="实力排行">{{ user.user_m.ability }}</td>
+        <td id="regist_time" title="注册时间">{{ tformat(user.user_m.regist_time) }}</td>
+        <td id="loading_time" title="登录时间">{{ tformat(user.user_m.loading_time) }}</td>
+        <td id="active_time" title="最后活跃时间">{{ tformat(user.user_m.active_time) }}</td>
+    </tr>
+    {% end %}
+</table>
+</body>
+<script type="text/javascript">
+function changecolor(obj, color){
+    obj.style.background=color;
+}
+</script>

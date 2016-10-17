@@ -1,0 +1,71 @@
+{% autoescape None %}
+<head>
+<style type="text/css">
+    #info{border-collapse:collapse;border:0;font-size:12px;text-align:left;width:800px}
+    #info td{border:0;padding:5px;}
+    #info td table{width:100%}
+
+    #data{border-collapse:collapse;border:1px solid #BEBEBE;font-size:12px;}
+    #data th{background:#BEBEBE;border-bottom:1px solid #BEBEBE;line-height:24px;font-weight:lighter;padding:2px}
+    #data td{border:1px solid #BEBEBE;padding:2px;text-align:center}
+
+    #data2{border-collapse:collapse;border:1px solid #BEBEBE;font-size:12px;}
+    #data2 th{background:#BEBEBE;border-bottom:1px solid #BEBEBE;line-height:24px;font-weight:lighter;padding:2px}
+    #data2 td{border:1px solid #BEBEBE;padding:2px;text-align:center}
+
+    #mindata{border-collapse:collapse;font-size:12px;}
+    #mindata td{width:100px;padding:3px;font-size:12px;}
+    .addinput{width:60px;}
+    .inp{width:60px;}
+
+    #nva{margin-left:0;padding-left:0;}
+    #nva li{font-size:12px;text-align:center;display:inline;}
+    #nva li span{font-weight:bold;}
+    .reset{color:red;}
+    .select{width:50px;}
+    small{font-size:16px; color:red;}
+</style>
+
+<script type="text/javascript">
+function changecolor(obj, color){
+    obj.style.background=color;
+}
+</script>
+</head>
+
+<body>
+<div style="font-size:12px;color:red">
+    {% if msg %}
+      {{ escape(msg) }}
+    {% end %}
+</div>
+<table id="data">
+    <tr>
+        <th>帐号</th>
+        <th>邮箱</th>
+        <th>最后登录IP</th>
+        <th>最后登录时间</th>
+        <th>操作(reset)</th>
+    </tr>
+    {% for admin in admin_list %}
+    <tr onmouseover="return changecolor(this, '#B3D9D9')" onmouseout="return changecolor(this, '')">
+         <td>{{ admin.username }}</td>
+         <td>{{ admin.email }}</td>
+         <td>{{ admin.last_ip }}</td>
+         <td>{{ tformat(admin.last_login) if isinstance(admin.last_login, int) else admin.last_login }}</td>
+         <td>
+             <a href="{{ get_url('/admin/admin_manage/?mid=%s' % admin.username) }}">管理</a>&nbsp;
+            {% if admin.username == 'admin' %}
+                &nbsp;
+            {% else %}
+                <a href="{{ get_url('/admin/admin_delete/?mid=%s' % admin.username) }}" onclick="return confirm('确定删除吗?')">删除</a>
+            {% end %}
+         </td>
+    </tr>
+    {% end %}
+</table>
+
+<p>
+    <a href="{{ get_url('/admin/admin_add/') }}">增加管理员</a>
+</p>
+</body>

@@ -1,0 +1,45 @@
+<body>
+<div style="font-size:12px;color:red">
+    {% if msg %}
+      {{ escape(msg) }}
+    {% end %}
+</div>
+<p>敬请期待！ '_'</p>
+<form action="{{ get_url('/admin/test_api/') }}" method="get">
+    <table>
+        <tr><td>
+          服务器地址:
+          <select name="method" value="">
+              {% for url, name in consts.HOST_URLS %}
+              <option value="{{ url }}">{{ name }}</option>
+              {% end %}
+          </select>
+          user_token:<input name="user_token" value="{{ consts.user_token }}" />
+          分服:
+          <select name="server_id" value="">
+              {% for server_id, obj in sorted(game_config.servers.iteritems()) %}
+              <option value="{{ server_id }}">{{ server_id }}--{{ obj.get('server_name', '') }}</option>
+              {% end %}
+          </select>
+        </td><td> </td></tr>
+        <tr><td>
+          接口:
+          <select name="method" value="">
+              {% for method, obj in sorted(consts.API_METHODS.iteritems()) %}
+              <option value="{{ method }}">{{ method }}</option>
+              {% end %}
+          </select>
+          </td>
+          <td> </td>
+          </tr>
+          {% for key, value in consts.API_METHODS['card.levelup']['params'] %}
+          <tr>
+              <td>{{ key }}:</td>
+              <td><input name="{{ key }}" value="{{ value }}" /></td>
+
+          </tr>
+          {% end %}
+    </table>
+<button type="submit" onclick="return confirm('确定发送吗？')">发送</button>
+</form>
+</body>

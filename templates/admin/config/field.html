@@ -1,0 +1,66 @@
+
+{% autoescape None %}
+<head>
+    <style type="text/css">
+        #info{border-collapse:collapse;border:0;font-size:12px;text-align:left;width:800px}
+        #info td{border:0;padding:5px;}
+        #info td table{width:100%}
+
+        #data{border-collapse:collapse;border:1px solid #BEBEBE;font-size:12px;}
+        #data th{background:#BEBEBE;border-bottom:1px solid #BEBEBE;line-height:24px;font-weight:lighter;padding:2px}
+        #data td{border:1px solid #BEBEBE;padding:2px;text-align:center}
+
+        #data2{border-collapse:collapse;border:1px solid #BEBEBE;font-size:12px;}
+        #data2 th{background:#BEBEBE;border-bottom:1px solid #BEBEBE;line-height:24px;font-weight:lighter;padding:2px}
+        #data2 td{border:1px solid #BEBEBE;padding:2px;text-align:center}
+
+        #mindata{border-collapse:collapse;font-size:12px;}
+        #mindata td{width:100px;padding:3px;font-size:12px;}
+        .addinput{width:60px;}
+        .inp{width:60px;}
+
+        #nva{margin-left:0;padding-left:0;}
+        #nva li{font-size:15px;text-align:center;display:inline;}
+        #nva li span{font-weight:bold;}
+        .reset{color:red;}
+        .select{width:50px;}
+        small{font-size:16px; color:red;}
+    </style>
+</head>
+
+<body>
+
+    <ul id="nva">
+    {% for data in user_field %}
+        <li onmouseover="return changecolor(this, '#B3D9D9')" onmouseout="return changecolor(this, '')">
+        {% if data[0] == field %}
+        <button target="main" onclick="location.href='{{ get_url('/admin/config/%s/' % data[0] ) }}';" style="font-size:15px">{{ data[1] }}</button>
+        {% else %}
+            <a href="{{ get_url('/admin/config/%s/' % data[0] ) }}" target="main">{{ data[1] }}</a>
+        {% end %}
+        </li>
+        &nbsp;
+    {% end %}
+    </ul>
+    提示消息:&nbsp;&nbsp;<small style="font-size:12px;color:red">{{ escape(msg) }}</small>
+    <hr>
+
+    {% block fieldbody %} {% end %}
+
+</body>
+
+
+<script type="text/javascript">
+    function changecolor(obj, color){
+        obj.style.background=color;
+    }
+        var obj=document.getElementById("data");
+        for(var i=0;i<obj.rows.length;i++){
+            obj.rows[i].onmouseover=function(){this.style.background="#B3D9D9";}
+            obj.rows[i].onmouseout=function(){this.style.background="";}
+        }
+    function mySwitch(){
+        var obj = document.getElementById('switch_display');
+        obj.style.display = obj.style.display=='none'?'block':'none';
+    }
+</script>

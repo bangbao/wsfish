@@ -1,0 +1,132 @@
+
+{% autoescape None %}
+<head>
+<style type="text/css">
+    #info{border-collapse:collapse;border:0;font-size:12px;text-align:left;width:800px}
+    #info td{border:0;padding:5px;}
+    #info td table{width:100%}
+
+    #data{border-collapse:collapse;border:1px solid #BEBEBE;font-size:12px;}
+    #data th{background:#BEBEBE;border-bottom:1px solid #BEBEBE;line-height:24px;font-weight:lighter;padding:2px}
+    #data td{border:1px solid #BEBEBE;padding:2px;text-align:center}
+
+    #data2{border-collapse:collapse;border:1px solid #BEBEBE;font-size:12px;}
+    #data2 th{background:#BEBEBE;border-bottom:1px solid #BEBEBE;line-height:24px;font-weight:lighter;padding:2px}
+    #data2 td{border:1px solid #BEBEBE;padding:2px;text-align:center}
+
+    #mindata{border-collapse:collapse;font-size:12px;}
+    #mindata td{width:100px;padding:3px;font-size:12px;}
+    .addinput{width:60px;}
+    .inp{width:60px;}
+
+    #nva{margin-left:0;padding-left:0;}
+    #nva li{font-size:12px;text-align:center;display:inline;}
+    #nva li span{font-weight:bold;}
+    .reset{color:red;}
+    .select{width:50px;}
+    small{font-size:16px; color:red;}
+</style>
+
+<script type="text/javascript">
+function changecolor(obj, color){
+    obj.style.background=color;
+}
+
+function mySwitch(){
+    var obj = document.getElementById('switch_display');
+    obj.style.display = obj.style.display=='none'?'block':'none';
+}
+
+//排序 tableId: 表的id,iCol:第几列 ；dataType：iCol对应的列显示数据的数据类型, reverse是否倒叙
+function sortAble(tableId, iCol, dataType, reverse) {
+    var table = document.getElementById(tableId);
+    var tbody = table.tBodies[0];
+    var colRows = tbody.rows;
+    var aTrs = new Array;
+
+    //将将得到的列放入数组，备用
+    for (var i=0; i < colRows.length; i++) {
+        aTrs[i] = colRows[i];
+    }
+
+    //判断上一次排列的列和现在需要排列的是否同一个。
+    if (table.sortCol == iCol) {
+        aTrs.reverse();
+    } else {
+    //如果不是同一列，使用数组的sort方法，传进排序函数
+        aTrs.sort(compareEle(iCol, dataType));
+        if (reverse) {aTrs.reverse();}
+    }
+
+    var oFragment = document.createDocumentFragment();
+
+    for (var i=0; i < aTrs.length; i++) {
+        oFragment.appendChild(aTrs[i]);
+    }
+    tbody.appendChild(oFragment);
+
+   //记录最后一次排序的列索引
+    table.sortCol = iCol;
+}
+
+//将列的类型转化成相应的可以排列的数据类型
+function convert(sValue, dataType) {
+    switch(dataType) {
+    case "int":
+    //debugger;
+        return parseInt(sValue);
+    case "float":
+        return parseFloat(sValue);
+    case "date":
+        return new Date(Date.parse(sValue));
+    case "str":
+        return sValue.toString();
+    default:
+        return sValue.toString();
+    }
+}
+
+//排序函数，iCol表示列索引，dataType表示该列的数据类型
+function compareEle(iCol, dataType) {
+    return  function (oTR1, oTR2) {
+        var vValue1 = convert(oTR1.cells[iCol].innerHTML, dataType);
+        var vValue2 = convert(oTR2.cells[iCol].innerHTML, dataType);
+        if (vValue1 < vValue2) {
+            return -1;
+        } else if (vValue1 > vValue2) {
+            return 1;
+        } else {
+            return 0;
+        }
+       };
+}
+</script>
+</head>
+<body>
+<h3>用户ID: &nbsp; <small>{{ user.uid }}</small>&nbsp;
+    用户昵称: <small>{{ user.user_m.username }}</small>&nbsp;
+    用户TOKEN: &nbsp;<small>{{ user.user_m.token }}</small>&nbsp;
+    所在分服: &nbsp;<small>{{ game_config.servers[user.server_id]['server_name'] }}</small>
+</h3>
+ 提示消息:&nbsp;&nbsp;<small style="font-size:12px;color:red">{{ escape(msg) }}</small>
+<hr>
+<ul id="nva">
+{% for data in user_field %}
+    <li onmouseover="return changecolor(this, '#B3D9D9')" onmouseout="return changecolor(this, '')">
+    {% if data[0] == field %}
+    <button target="main" onclick="location.href='{{ get_url('/admin/%s/show/?uid=%s' % (data[0], user.uid)) }}';">{{ data[1] }}</button>
+    {% else %}
+        <a href="{{ get_url('/admin/%s/show/' % data[0]) }}?uid={{ user.uid }}" target="main">{{ data[1] }}</a>
+    {% end %}
+    </li>
+    &nbsp;
+{% end %}
+</ul>
+<hr>
+
+{% block fieldbody %} {% end %}
+
+
+</body>
+
+
