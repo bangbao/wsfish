@@ -4,6 +4,7 @@ import os
 import sys
 import site
 import shutil
+import subprocess
 import settings
 
 
@@ -47,10 +48,8 @@ def buildup(buildup_dir):
     cmd = 'pyinstaller -F %s -p %s -n %s' % (script_names, sitepathes, exefilename)
     print 'buildup ready, start cmd: %s' % cmd
 
-    pwd = os.getcwd()
-    os.chdir(buildup_dir)
-    os.system(cmd)
-    os.chdir(pwd)
+    p = subprocess.Popen(cmd, shell=True)
+    p.wait()
 
     exepath = os.path.join(buildup_dir, 'dist', exefilename)
     if not os.path.isfile(exepath):
