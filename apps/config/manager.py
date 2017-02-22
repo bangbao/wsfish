@@ -46,6 +46,7 @@ class ConfigManager(Singleton):
         self.cfg_ver = make_version(self.client_config_versions)
         self.reload_version = int(time.time())
 
+        ConfigVersion.set(self.config_versions, self.reload_version)
         cv_obj = ConfigVersion.get()
         self.reload_version = cv_obj.reload_version
         self.api_check_version = cv_obj.api_check_version

@@ -12,6 +12,7 @@ import psutil
 import tornado.web
 import tornado.ioloop
 import tornado.httpserver
+from tornado.log import access_log
 from tornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
@@ -30,6 +31,21 @@ from threads import AuthThread, GameThread, UserLogin
 from apps.config import game_config
 
 
+def app_log(handler):
+    status = handler.get_status()
+    if status < 400:
+        log_method = access_log.info
+        uri = handler.request.uri
+        if uri in ():
+            return
+    elif status < 500:
+        log_method = access_log.warning
+    else:
+        log_method = access_log.error
+    request_time = 1000 * handler.request.request_time()
+    log_method('%d %s %.2fms', status, handler._request_summary(), request_time)
+
+
 class Application(tornado.web.Application):
     def __init__(self, debug=False):
         handlers = [
@@ -37,6 +53,7 @@ class Application(tornado.web.Application):
             (r"/admin/.*", AdminHandler),
         ]
         super(Application, self).__init__(handlers, debug=debug,
+                                          log_function=app_log,
                                           **settings.TORNADO_SETTINGS)
 
         self.auth_thread = AuthThread()

@@ -1,0 +1,6 @@
+tornado
+xlrd
+pymongo
+redis
+psutil
+celery
