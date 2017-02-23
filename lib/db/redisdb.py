@@ -8,7 +8,7 @@ import itertools
 import cPickle as pickle
 
 import settings
-from lib.utils import md5, generate_rank_score
+from lib.utils.helper import generate_rank_score
 from lib.utils.debug import print_log_maker
 
 
@@ -123,14 +123,6 @@ class ModelBase(ModelTools):
         cls._attrs_base = {
             '_data_version__': 0,
         }
-        # 不对数据做diff
-        # cls._old_data = {}  # attr_key: copy.deepcopy(data)
-        # cls._diff = {  # 数据的变化
-        #             # attr_key: {
-        #             #     'update': {key: data}, # 新加入的和修改的数据
-        #             #     'remove': set(keys),   # 删除的key
-        # }
-
         return object.__new__(cls)
 
     def __init__(self, uid=None):
@@ -266,27 +258,19 @@ class ModelBase(ModelTools):
                 setattr(self, k, data[k])
 
 
-class RedisSTRINGModelBase(ModelTools):
+class RedisConsts(object):
+    """
+    """
+    R_TOKEN = 'token:{0}'
+
+
+class RedisString(object):
     """REDIS string 结构
     """
-    KEY_PREFIX = 'redis_string'
-
-    @classmethod
-    def get(cls, uid, server_id='00'):
-        return cls(uid, server_id)
-
-    @classmethod
-    def make_key(cls, server):
-        uid = '%s_%s' % (cls.KEY_PREFIX, server)
-        return cls.make_key_cls(uid)
-
-    def __init__(self, uid, server_id, key=None):
+    def __init__(self, redis, uid, redis_key):
         self.uid = uid
-        self.server_id = server_id
-        self.key = key or self.make_key(server_id)
-        self.name = self.key
-        self.redis = self.get_redis_client(self.uid, self.server_id)
-        self.changed = False
+        self.redis = redis
+        self.key = redis_key
 
     def get_value(self):
         """ 获取值
@@ -322,33 +306,17 @@ class RedisSTRINGModelBase(ModelTools):
         self.redis.delete(self.key)
 
 
-class RedisRankModelBase(ModelTools):
+class RedisRank(object):
     """排名用的基类
     """
-    KEY_PREFIX = 'redis_sorted_set'
-    score_cast_func = float
-
-    @classmethod
-    def get(cls, uid, server_id, key=None):
-        return cls(uid, server_id, key)
-
-    @classmethod
-    def make_key(cls, server, new=False):
-        if new:
-            key = '%s_%s' % (cls.KEY_PREFIX, server)
-            return cls.make_key_cls(key)
-        return '%s%s_%s' % (settings.KEY_PREFIX, cls.KEY_PREFIX, server)
-
-    def __init__(self, uid, server_id, key=None):
+    def __init__(self, redis, uid, redis_key, score_cast_func=float):
         self.uid = uid
-        self.server_id = server_id
-        self.key = key or self.make_key(server_id)
-        self.redis = self.get_redis_client(self.uid, self.server_id)
-        self.changed = False
+        self.redis = redis
+        self.key = redis_key
 
     @property
     def rank(self):
-        """实时排名
+        """实时排名(从1开始)
         """
         return self.get_rank(self.uid)
 
@@ -359,19 +327,22 @@ class RedisRankModelBase(ModelTools):
         return self.get_score(self.uid)
 
     def get_rank(self, uid):
+        """获取排名
+        """
         rank = self.redis.zrevrank(self.key, uid)
         if rank is None:
             return 0
-        rank += 1
-        return rank
+        return rank + 1
 
     def get_score(self, uid):
+        """获取分数
+        """
         score = self.redis.zscore(self.key, uid)
         if score is None:
             return 0
         return self.score_cast_func(score)
 
-    def reset(self):
+    def zrem(self):
         """重置个人数据
         """
         self.redis.zrem(self.key, self.uid)
@@ -383,22 +354,16 @@ class RedisRankModelBase(ModelTools):
 
     def zcard(self):
         """ 获取当前key里所有的人数
-        Returns:
-            总人数
         """
         return self.redis.zcard(self.key)
 
     def snapshot_to(self, snapshot_key):
         """ 将redis数据快照到另一个key上
-        Args:
-           要快照的key
         """
         self.redis.zunionstore(snapshot_key, {self.key: 1}, aggregate=None)
 
     def incr(self, value, weight=False):
         """ 将自身积分增量
-        Args:
-           value: 增量数值
         """
         if weight:
             value = generate_rank_score(value)
@@ -412,7 +377,8 @@ class RedisRankModelBase(ModelTools):
         self.redis.zadd(self.key, self.uid, value)
 
     def zadd_multi(self, data):
-        self.redis.zadd(self.key, **data)
+        if data:
+            self.redis.zadd(self.key, **data)
 
     def zrevrange(self, min_rank, max_rank, withscores=False):
         """ 查找从指定名次到指定名次间的所有排名
@@ -421,7 +387,7 @@ class RedisRankModelBase(ModelTools):
             max_rank: 最大排名
             withscores: 是否返回积分
         Returns:
-            符合条件的列表
+            list: 符合条件的列表
         """
         return self.redis.zrevrange(self.key, min_rank - 1, max_rank - 1,
                                     withscores=withscores)
@@ -434,7 +400,7 @@ class RedisRankModelBase(ModelTools):
             num:  数量
             withscores: 是否返回积分
         Returns:
-            符合条件的列表
+           list: 符合条件的列表
         """
         return self.redis.zrevrangebyscore(self.key, max_score, min_score,
                                            start=0 if num else None,
@@ -557,21 +523,15 @@ class RedisRankModelBase(ModelTools):
             max_rank: 最大排名, 0表示全部
             withscores: 是否返回积分
         Returns:
-            符合条件的列表
+            list: 符合条件的列表
         """
         return self.redis.zrevrange(self.key, min_rank - 1, max_rank - 1,
                                     withscores=withscores)
 
 
-class RedisSetModelBase(ModelTools):
+class RedisSet(object):
     """REDIS set集合
     """
-    KEY_PREFIX = 'redis_set'
-
-    @classmethod
-    def get(cls, uid, server_id='00'):
-        return cls(uid, server_id)
-
     def __init__(self, uid, server_id):
         self.uid = uid
         self.server_id = server_id
@@ -615,27 +575,14 @@ class RedisSetModelBase(ModelTools):
         pipe.execute()
 
 
-class RedisHashModelBase(ModelTools):
+class RedisHash(ModelTools):
     """REDIS hash 结构
     """
-    KEY_PREFIX = 'redis_hash'
-
-    @classmethod
-    def get(cls, uid, server_id='00'):
-        return cls(uid, server_id)
-
-    @classmethod
-    def make_key(cls, server):
-        uid = '%s_%s' % (cls.KEY_PREFIX, server)
-        return cls.make_key_cls(uid)
-
-    def __init__(self, uid, server_id, key=None):
+    def __init__(self, redis, redis_key, uid):
         self.uid = uid
-        self.server_id = server_id
-        self.key = key or self.make_key(server_id)
+        self.key = redis_key
         self.name = self.key
-        self.redis = self.get_redis_client(self.uid, self.server_id)
-        self.changed = False
+        self.redis = redis
 
     def hdel(self, *sub_keys):
         self.redis.hdel(self.name, *sub_keys)
@@ -680,26 +627,42 @@ class RedisHashModelBase(ModelTools):
         self.redis.delete(self.name)
 
 
-class RedisListModelBase(ModelTools):
+class RedisList(ModelTools):
     """REDIS list 结构
     """
-    KEY_PREFIX = 'redis_list'
-
-    @classmethod
-    def get(cls, uid, server_id='00'):
-        return cls(uid, server_id)
-
-    @classmethod
-    def make_key(cls, server):
-        uid = '%s_%s' % (cls.KEY_PREFIX, server)
-        return cls.make_key_cls(uid)
-
-    def __init__(self, uid, server_id, key=None):
-        self.uid = uid
-        self.server_id = server_id
-        self.key = key or self.make_key(server_id)
-        self.name = self.key
-        self.redis = self.get_redis_client(self.uid, self.server_id)
-        self.changed = False
+    def __init__(self, redis, redis_key):
+        self.redis = redis
+        self.key = redis_key
 
 
+class RedisPubSub(object):
+    """REDIS pubsub
+    """
+    def __init__(self, redis, *channels):
+        self.redis = redis
+        self.pubsub = redis.pubsub
+        self.channels = set()
+        if channels:
+            self.subscribe(*channels)
+
+    def publish(self, channel, message):
+        """发布消息
+        """
+        self.redis.publish(channel, message)
+
+    def subscribe(self, *channels):
+        """订阅频道
+        """
+        self.channels.update(channels)
+        self.pubsub.subscribe(*channels)
+
+    def get_message(self, ignore_subscribe_messages=False, timeout=0):
+        """获取消息
+        """
+        return self.pubsub.get_message(ignore_subscribe_messages, timeout)
+
+    def close(self):
+        self.pubsub.close()
+
+    def __del__(self):
+        self.close()

@@ -6,7 +6,7 @@ import datetime
 import json
 
 import settings
-from lib.utils import md5, merge_dict
+from lib.utils.helper import md5, merge_dict
 from apps.public import timer
 from apps.config import game_config
 from . import logics

@@ -3,7 +3,7 @@
 import os
 import time
 import xlrd
-from lib.utils import make_version
+from lib.utils.helper import make_version
 from . import consts
 from . import convert
 from .models import Config, ConfigVersion

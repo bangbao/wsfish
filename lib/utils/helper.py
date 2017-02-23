@@ -146,9 +146,14 @@ def random_hit(probability):
     return sys_random.randint(1, 100) <= probability
 
 
+def md5(datastr):
+    return hashlib.md5(datastr).hexdigest()
+
+
 def dict_md5(data):
     datastr = json.dumps(data, sort_keys=True)
     return hashlib.md5(datastr).hexdigest()
+
 
 def make_version(data):
     return dict_md5(data)

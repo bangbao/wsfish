@@ -5,8 +5,8 @@ import datetime
 
 import settings
 from lib.db import ModelBase
-from lib.db.redisdb import RedisRankModelBase, RedisHashModelBase, make_redis_client
-from lib.utils.generator import trans_uid, salt_generator
+from lib.db.redisdb import RedisRank, RedisHash, make_redis_client
+from lib.utils.helper import trans_uid, random_chars
 from apps.config import game_config
 from . import consts
 from . import logics
@@ -130,7 +130,7 @@ class Footprint(ModelBase):
     @classmethod
     def create_salt(cls, user_token):
         obj = cls.get(user_token)
-        obj.setattr(salt=salt_generator())
+        obj.setattr(salt=random_chars())
         obj.save()
         return obj.salt
 
@@ -1086,19 +1086,19 @@ class UserM(ModelBase):
         super(UserM, self).save()
 
 
-class LevelRank(RedisRankModelBase):
+class LevelRank(RedisRank):
     """等级排行
     """
     KEY_PREFIX = 'level_rank'
 
 
-class ExpRank(RedisRankModelBase):
+class ExpRank(RedisRank):
     """经验值排行
     """
     KEY_PREFIX = 'exp_rank'
 
 
-class OnlineRank(RedisRankModelBase):
+class OnlineRank(RedisRank):
     """在线排行
     """
     KEY_PREFIX = 'online_rank'
@@ -1131,37 +1131,37 @@ class RegistRank(OnlineRank):
     KEY_PREFIX = 'regist_rank'
 
 
-class UsernameHash(RedisHashModelBase):
+class UsernameHash(RedisHash):
     """用户名字集合 - REDIS hash 结构
     """
     KEY_PREFIX = 'username_hash'
 
 
-class BanRank(RedisRankModelBase):
+class BanRank(RedisRank):
     """封号列表集合
     """
     KEY_PREFIX = 'ban_rank'
 
 
-class AbilityRank(RedisRankModelBase):
+class AbilityRank(RedisRank):
     """战斗实力排行
     """
     KEY_PREFIX = 'ability_rank'
 
 
-class HighestAbilityRank(RedisRankModelBase):
+class HighestAbilityRank(RedisRank):
     """昨天最高战斗实力排行
     """
     KEY_PREFIX = 'highest_ability_rank'
 
 
-class TodayHighestAbilityRank(RedisRankModelBase):
+class TodayHighestAbilityRank(RedisRank):
     """今日最高战斗实力排行
     """
     KEY_PREFIX = 'today_highest_ability_rank'
 
 
-class Statistics(RedisHashModelBase):
+class Statistics(RedisHash):
     """用户数据统计字典
     日期  登陆用户 新增登陆 付费人数 新增登陆付费人数 新增付费人数 留存付费用户 付费金额 新增付费金额 付费率 付费ARPU 登陆ARPU
     注释

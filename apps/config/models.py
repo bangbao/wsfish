@@ -6,13 +6,6 @@ import hashlib
 from lib.db import ModelBase
 
 
-def make_version(value):
-    """计算配置内容版本号
-    """
-    datastr = json.dumps(value, sort_keys=True)
-    return hashlib.md5(datastr).hexdigest()
-
-
 class ConfigFile(object):
     """配置文件
     """

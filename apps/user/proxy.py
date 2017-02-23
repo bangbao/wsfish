@@ -5,7 +5,7 @@ import weakref
 
 import settings
 
-from lib.utils import strftimestamp
+from lib.utils.helper import strftimestamp
 from apps import public as public_app
 from apps.public import consts as pub_consts
 from apps.config import game_config

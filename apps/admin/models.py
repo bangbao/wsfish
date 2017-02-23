@@ -4,7 +4,7 @@ import datetime
 import cPickle as pickle
 
 import settings
-from lib.utils import md5
+from lib.utils.helper import md5
 from lib.db import make_redis_client
 from . import consts
 

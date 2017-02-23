@@ -5,7 +5,7 @@ import time
 from pprint import pformat
 
 import settings
-from lib.utils import strftimestamp
+from lib.utils.helper import strftimestamp
 from lib.utils.mail import ErrorMail
 from apps import user as user_app
 from apps import notify as notify_app

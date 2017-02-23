@@ -6,7 +6,7 @@ import socket
 import traceback
 import urllib
 
-from lib.utils import md5
+from lib.utils.helper import md5
 from collections import defaultdict
 
 #                 正文       title  addrs

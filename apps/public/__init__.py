@@ -5,7 +5,7 @@ import re
 import copy
 
 import settings
-from lib.utils import weight_choice
+from lib.utils.helper import weight_choice
 from apps.config import game_config
 from . import text
 from . import consts
