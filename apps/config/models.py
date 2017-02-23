@@ -1,7 +1,25 @@
 # coding: utf-8
 
 import time
+import json
+import hashlib
 from lib.db import ModelBase
+
+
+def make_version(value):
+    """计算配置内容版本号
+    """
+    datastr = json.dumps(value, sort_keys=True)
+    return hashlib.md5(datastr).hexdigest()
+
+
+class ConfigFile(object):
+    """配置文件
+    """
+    def __init__(self, key=None, value=None, version=None):
+        self.key = key
+        self.value = value if value is not None else {}
+        self.version = version
 
 
 class Config(ModelBase):

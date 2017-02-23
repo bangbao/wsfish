@@ -89,17 +89,9 @@ class ConfigManager(Singleton):
             self.api_check_version = cv_obj.api_check_version
         return flag
 
-    def get_raw_config(self, name):
-        """获取数据库中的配置内容
-        """
-        obj = Config.get(name)
-
-        value = obj.value
-        if isinstance(value, basestring):
-            value = eval(value)
-        return value
-
     def get_config(self, name):
+        """获取一个配置
+        """
         return Config.get(name)
 
     def set_config(self, name, value):
@@ -112,65 +104,8 @@ class ConfigManager(Singleton):
         """
         ConfigVersion.update_reload_version(api_check_version)
 
-    def get_monster_detail(self, monster_id):
-        """根据id取不同配置
-        """
-        if 10000 <= monster_id <= 19999:
-            return self.monster_op[monster_id]
-
-        if 100000 <= monster_id <= 199999:
-            return self.monster_robpatch[monster_id]
-
-        if 200000 <= monster_id <= 209999:
-            return self.monster_arena[monster_id]
-
-        if 210000 <= monster_id <= 219999:
-            return self.monster_system[monster_id]
-
-        if 300000 <= monster_id <= 399999:
-            return self.monster_vs[monster_id]
-
-        if 1000000 <= monster_id <= 10999999:
-            return self.monster_main[monster_id]
-
-        if 11000000 <= monster_id <= 20999999:
-            return self.monster_main11[monster_id]
-
-        if 21000000 <= monster_id <= 30999999:
-            return self.monster_main21[monster_id]
-
-        if 31000000 <= monster_id <= 40999999:
-            return self.monster_main31[monster_id]
-
-        if 200000000 <= monster_id <= 299999999:
-            return self.monster_legend[monster_id]
-
-        if 300000000 <= monster_id <= 399999999:
-            return self.monster_1v1[monster_id]
-
-        if 500000000 <= monster_id <= 599999999:
-            return self.monster_dynasty[monster_id]
-
-        if 10020000000 <= monster_id <= 10029999999:
-            return self.monster_money[monster_id]
-
-    def has_monster_detail(self, monster_id):
-        """是否在monster配置中
-        """
-        try:
-            return bool(self.get_monster_detail(monster_id))
-        except KeyError:
-            return False
-
-    def yield_open_servers(self):
-        """返回已经开启的分服数据
-        """
-        now_str = time.strftime('%Y-%m-%d %H:%M:%S')
-        for server_id, server_data in self.servers.iteritems():
-            if server_data['open_time'] <= now_str:
-                yield server_id, server_data
-
-    def import_file(self, filepath, save=True):
+    @classmethod
+    def import_file(cls, filepath, save=True):
         """配置文件导入
         Args:
             filepath: 配置xlsx路径
@@ -191,16 +126,15 @@ class ConfigManager(Singleton):
             value = convert.xls_to_config(config_name, data)
 
             if save:
-                old_config = getattr(self, config_name, {})
-                if old_config != value:
-                    self.set_config(config_name, value)
-                    done_list.append(sheet_name)
+                cls.set_config(config_name, value)
+                done_list.append(sheet_name)
             else:
                 return value
 
         return done_list
 
-    def import_dir(self, dirpath, save=True):
+    @classmethod
+    def import_dir(cls, dirpath, save=True):
         """导入目录下所有配置
         Args:
             dirpath: 目录路径
@@ -211,16 +145,16 @@ class ConfigManager(Singleton):
         for filename in sorted(os.listdir(dirpath)):
             filepath = os.path.join(dirpath, filename)
             try:
-                self.import_file(filepath, save)
-                print 'success: %s' % filename
+                cls.import_file(filepath, save)
+                print('success: %s' % filename)
             except Exception as e:
                 error_files.append((filename, e))
 
         if error_files:
-            print 'error_files:'
+            print('error_files:')
             for f, e in error_files:
-                print '\t%s %r' % (f, e)
-            print
+                print('\t%s %r' % (f, e))
+            print()
 
 
 if __name__ == '__main__':
