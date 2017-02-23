@@ -120,6 +120,21 @@ def timestamp_to_str62(timestamp=None):
     return int_to_str62(timestamp)
 
 
+def trans_ip2number(ip):
+    """把ip格式转换成数字， 三位数补齐
+    """
+    numbers = ('%03d' % int(number) for number in ip.split('.'))
+    return int(''.join(numbers))
+
+
+def trans_number2ip(number):
+    """还原数字->ip
+    """
+    strip = str(number)
+    numbers = (str(int(strip[index:index+3])) for index in xrange(0, len(strip), 3))
+    return '.'.join(numbers)
+
+
 def random_hit(probability):
     """ 判断概率是否命中
     随机0-100判断当前指定的概率是否符合要求
