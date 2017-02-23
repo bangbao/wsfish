@@ -84,7 +84,3 @@ class FishFightGame(object):
         self.tables.on_player_request(p, message)
         # 让玩家处理消息
         p.on_request(message)
-
-    def handle_gm_commond(self, commond):
-        # 系统管理指令， 由外部管理接口传入
-        pass
