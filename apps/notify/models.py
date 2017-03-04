@@ -3,7 +3,7 @@
 import time
 
 from lib.db import ModelBase
-from lib.utils.generator import timestamp_to_str62, salt_generator
+from lib.utils.helper import timestamp_to_str62, random_chars
 from apps.config import game_config
 
 MESSAGES_LEN = 40
@@ -87,7 +87,7 @@ class Notify(ModelBase):
         self.changed = True
         # 生成id, 若传时间，伪装下发送的时间
         ts = kwargs.get('ts', int(time.time()))
-        id_list = [timestamp_to_str62(ts), salt_generator(), sort]
+        id_list = [timestamp_to_str62(ts), random_chars(), sort]
         gift = _gift or []
         for one_gift in gift[:3]:
             id_list.extend(one_gift)

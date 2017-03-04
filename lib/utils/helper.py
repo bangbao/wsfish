@@ -135,6 +135,18 @@ def trans_number2ip(number):
     return '.'.join(numbers)
 
 
+def ip2num(ip):
+    """把ip格式转换成数字
+    """
+    return sum(int(x)*256**i for i, x in enumerate(reversed(ip.split('.'))))
+
+
+def num2ip(num):
+    """还原数字->ip
+    """
+    return '.'.join(str(num/(256**i)%256 for i in xrange(3, -1, -1)))
+
+
 def random_hit(probability):
     """ 判断概率是否命中
     随机0-100判断当前指定的概率是否符合要求
