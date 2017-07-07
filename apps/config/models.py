@@ -55,6 +55,10 @@ class ConfigVersion(ModelBase):
         return super(ConfigVersion, cls).get(uid)
 
     @classmethod
+    def set(cls, key, version):
+        return cls.update_single(key, version)
+
+    @classmethod
     def update_single(cls, field, version):
         obj = cls.get()
         obj.versions[field] = version

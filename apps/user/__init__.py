@@ -51,7 +51,7 @@ def get_user(uid, server_id='', read_only=False):
         用户代理对象
     """
     if uid or not server_id:
-        server_id = settings.get_server_by_uid(uid) or server_id
+        server_id = server_id
     return User(uid, server_id, read_only)
 
 

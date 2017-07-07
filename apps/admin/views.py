@@ -248,7 +248,7 @@ def modify_server(req):
     open_time = req.get_argument('open_time', '')
     status = int(req.get_argument('status', 1))
 
-    servers = game_config.get_raw_config('servers')
+    servers = game_config.get_config('servers')
     if open_time:
         try:
             time.strptime(open_time, '%Y-%m-%d %H:%M:%S')
