@@ -39,7 +39,7 @@
     <form action="{{ get_url('/admin/username/show/') }}" method="get">
         服务器:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <select name="server_id" value="">
-            {% for server_id, obj in sorted(game_config.yield_open_servers(), reverse=True) %}
+            {% for server_id, obj in sorted(game_config.servers.iteritems(), reverse=True) %}
                 <option value="{{ obj['server_id'] }}">{{ obj['server_name'] }}({{ obj['server_id'] }})</option>
             {% end %}
         </select><br/>
@@ -57,7 +57,7 @@
     <td>
         分服排行查询:&nbsp;&nbsp;
         <select name="server_id" value="01">
-            {% for server_id, obj in sorted(game_config.yield_open_servers(), reverse=True) %}
+            {% for server_id, obj in sorted(game_config.servers.iteritems(), reverse=True) %}
             {% if server_id == select_server %}
                 <option value="{{ obj['server_id'] }}" selected>{{ obj['server_name'] }}({{ obj['server_id'] }})</option>
             {% else %}

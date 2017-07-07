@@ -35,7 +35,7 @@ class AuthThread(threading.Thread):
 
         while True:
             try:
-                data = self.dataQueue.get(True)
+                data = self.dataQueue.get(True, 1)
             except Queue.Empty:
                 continue
             if data is None:

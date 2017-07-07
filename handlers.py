@@ -1,9 +1,13 @@
 # coding: utf-8
 
+import json
+import tornado.web
+import tornado.gen
 import tornado.ioloop
 from tornado.websocket import WebSocketHandler
 from apps import gate
 from apps.admin import auth as admin_auth
+from lib.core.environ import APIEnviron
 
 
 CONNECTION_STATUS_CLOSED = 0
@@ -152,7 +156,6 @@ class WSHandler(WSBaseHandler):
                     handler.write_message(message)
 
 
-
 class AdminHandler(tornado.web.RequestHandler):
     """ 后台统一 Handler
     全部后台处理公共接口
@@ -192,4 +195,176 @@ class AdminHandler(tornado.web.RequestHandler):
         """ 处理POST请求
         """
         self.render_to_response()
+
+
+class UserMixIn(object):
+    """ user嵌入类
+    将get_current_user独立出来方便其它Handler共用
+    """
+    def get_current_user(self, env):
+        """ 获取当前用户对象
+        Args:
+            env: 运行环境
+        Returns:
+            用户对象
+        """
+        user_token = env.req.get_argument('user_token', '')
+        if not user_token:
+            return None
+
+        server_id = env.req.get_argument('server_id', '')
+        platform = env.get_argument('channel', '')
+        deviceid = env.get_argument('deviceid', '')
+        user = user_app.get_user_by_token(user_token, server_id)
+
+        # 更新用户的一些设备信息
+        if user and user.exists():
+            user.user_m.update_login_stats()
+            user.user_m.set_platform_and_deviceid(platform, deviceid)
+
+        return user
+
+
+class BaseRequestHandler(tornado.web.RequestHandler):
+    """基本handler
+    """
+    def initialize(self):
+        """ 初始化操作
+        创建全局环境和运行环境
+        """
+        self.logger = Logger()
+        # 请求前自动更新配置
+        # game_config.auto_reload()
+
+    def prepare(self):
+        """处理请求前先准备一些数据
+        """
+        if self.logger:
+            self.logger.prepare_logger(self.env)
+
+    def on_finish(self):
+        """ 处理异步方法
+        """
+        # 写动作日志
+        if self.logger:
+            self.logger.handle_logger(self.env)
+
+        # for callback in self.env.callbacks:
+        #    callback(self.env)
+
+        self.env.finish()
+        del self.env
+
+    def summary_params(self):
+        """
+        """
+        return self.request.arguments
+
+
+class APIRequestHandler(UserMixIn, BaseRequestHandler):
+    """ 统一的API Handler
+    全部API处理公共接口
+    """
+    # executor 是局部变量 不是全局的, 线程数量控制
+    # executor = ThreadPoolExecutor(settings.THREAD_POOL_EXECUTOR_MAX_WORKERS)
+
+    # @run_on_executor
+    def api(self):
+        """ API统一调用方法
+        """
+        return gate.api_response(self.env)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self):
+        """ 处理GET请求
+        """
+        try:
+            # response = yield self.api()
+            response = self.api()
+            if not isinstance(response, basestring):
+                response = json.dumps(response, ensure_ascii=False)
+            self.write(response)
+        finally:
+            self.finish()
+
+    def post(self):
+        """ 处理POST请求
+        """
+        self.get()
+
+    def set_default_headers(self):
+        """设定一些http头信息
+        """
+        self.set_header('Content-Type', 'application/json; charset=UTF-8')
+
+
+class LoadingHandler(APIRequestHandler):
+    """处理一些不用生成用户对象的请求
+    """
+    # executor 是局部变量 不是全局的, 线程数量控制
+    # executor = ThreadPoolExecutor(settings.THREAD_POOL_EXECUTOR_MAX_WORKERS)
+
+    def get_current_user(self, env):
+        """ 获取当前用户对象
+        """
+        return None
+
+    # @run_on_executor
+    def api(self):
+        """ API统一调用方法
+        """
+        return gate.loading_response(self.env)
+
+
+class PayHandler(BaseRequestHandler):
+    """支付相关的处理
+    """
+    # executor 是局部变量 不是全局的, 线程数量控制
+    # executor = ThreadPoolExecutor(settings.THREAD_POOL_EXECUTOR_MAX_WORKERS)
+
+    def initialize(self, callback=False):
+        """ 初始化操作
+        创建全局环境和运行环境
+        """
+        self.logger = None
+        self.env = APIEnviron.build_env(self)
+        self.callback = callback
+        # 请求前自动更新配置
+        # game_config.auto_reload()
+
+    def get_current_user(self, env):
+        return None
+
+    # @run_on_executor
+    def api(self, tp):
+        """ API统一调用方法
+        """
+        return gate.pay_response(self.env, tp, self.callback)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self, tp=None):
+        """ 处理GET请求
+        """
+        try:
+            # response = yield self.api(tp)
+            response = self.api(tp)
+            if not isinstance(response, basestring):
+                response = json.dumps(response, ensure_ascii=False, default=to_json)
+            else:
+                self.set_header('Content-Type', 'text/plain')
+            self.write(response)
+        finally:
+            self.finish()
+
+    def post(self, tp=None):
+        """ 处理POST请求
+        """
+        self.get(tp)
+
+
+if __name__ == "__main__":
+    pass
+
 

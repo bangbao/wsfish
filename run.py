@@ -26,7 +26,7 @@ options.parse_command_line()
 # 设定进程使用的配置文件
 import settings
 settings.set_env(options.env_name)
-from handlers import WSHandler, AdminHandler
+from handlers import WSHandler, AdminHandler, APIRequestHandler, LoadingHandler
 from threads import AuthThread, GameThread, UserLogin
 from apps.config import game_config
 
@@ -51,6 +51,8 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/ws/", WSHandler),
             (r"/admin/.*", AdminHandler),
+            (r"/api/", APIRequestHandler),
+            (r"/loading/", LoadingHandler),
         ]
         super(Application, self).__init__(handlers, debug=debug,
                                           log_function=app_log,
@@ -101,6 +103,7 @@ def main_single():
                 logging.info('stop_loop delayed: pid=%s' % os.getpid())
             else:
                 logging.info('stop_loop success: pid=%s' % os.getpid())
+                app.stop_application()
                 io_loop.stop()
         stop_loop()
 
@@ -116,6 +119,10 @@ def main_single():
     logging.info('start_single_loop success: pid=%s' % os.getpid())
     io_loop = tornado.ioloop.IOLoop.instance()
     io_loop.start()
+
+
+def main():
+    main_single()
 
 
 if __name__ == "__main__":

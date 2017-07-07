@@ -182,7 +182,7 @@ def admin_manage(req):
 def server_list(req, msg=''):
     """服务器配置
     """
-    servers = game_config.get_raw_config('servers')
+    servers = game_config.get_config('servers')
     new_server_id = ('%02d' % (int(max(servers)) + 1)) if servers else '01'
     user_counts = TokenServerUid.get_user_count()
     now = datetime.datetime.now()
@@ -210,7 +210,7 @@ def create_new_server(req):
     uid_start_num = int(req.get_argument('uid_start_num', 0))
     uid_start_num = uid_start_num or random.randint(610, 800)
 
-    servers = game_config.get_raw_config('servers')
+    servers = game_config.get_config('servers')
     if server_id in servers:
         msg = 'error: server_id exists'
     elif not server_name:

@@ -12,7 +12,7 @@ CONFIG_LIST = (
     ('month_gift',              'month_gift',       None,                   1),
 )
 
-SHEET_CONFIG_MAP = dict((i[1], i[0]) for i in CONFIG_LIST)
+SHEET_CONFIG_MAP = dict((i[1], i[0]) for i in CONFIG_LIST if i[1])
 CONFIG_TEMPLATES = {
     'award_sp': {
         'pk': ('id', 'int'),

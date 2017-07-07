@@ -14,23 +14,14 @@ SEND_LOG_TO_REYUN = False # 是否发送日志给reyun
 AD_CLICK_CALLBACK = False  # 是否需要广告回调
 
 ADMINS = (
-    'basketball_error@126.com',
+    'error@126.com',
 )
 # 客户端报错邮件接收人
 CLIENT_DEVELOP = (
-    'basketball_client@126.com',
+    'client@126.com',
 )
 DEFAULT_ADMIN_MANAGER = (
-    ('yanwei.zhang', '1qwe32'),
-    ('niuchanrong', '123465'),
-    ('wangminying', '123465'),
-    ('shuoquan.man', '123465'),
-    ('shuai.zhang', '123465'),
-    ('an.qin', '123465'),
-    ('yiwei.zhang', '805500'),
-    ('haoran.di', '805500'),
-    ('chenguang.li', '805500'),
-    ('fuhaiyang', '123465'),
+    ('aaa.bbb', '1qwe32'),
 )
 
 URL_PREFIX = 'nba'
@@ -64,7 +55,7 @@ MAIL_SETTINGS = {
 # 推送设置
 PUSH_NOTIFICATION = {}
 # 热云统计平台appkey
-STATS_REYUN_APPKEY = '3a2d6061147c69b7e766dba0de0ba45d'
+STATS_REYUN_APPKEY = 'xsfasdfasdfaefdsfasd'
 # 所有接入的平台
 ALL_PLATFORMS = ('zhengyueapp', 'appstore', 'android',
                  'pp', 'haima', 'zhengyue', '91', 'tongbu', 'kuaiyong',
@@ -76,31 +67,20 @@ ALL_PLATFORMS = ('zhengyueapp', 'appstore', 'android',
                  'zhuoyue', 'zhuoyueandroid')
 # 平台支付回调地址们
 PAYMENT_NOTIFY_URLS = {
-    'haima': 'http://123.59.32.16/basketballiosbreak/pay-callback-haima/',
 }
 # 平台下定单的地址
 PAYMENT_ORDER_URLS = {
-    'vivo': 'http://123.59.32.17/basketballandroid/pay/?method=payment.get_vivo_order&',
-    'jinli': 'http://123.59.32.17/basketballandroid/pay/?method=payment.get_jinli_order&',
 }
 # 已方charge表商品编号对应一些平台商品编号的映射
 PAYMENT_WARESID_MAP = {
-    'lenovo': {1: 2067, 2: 2068, 3: 2069, 4: 2071, 5: 2090, 6: 2070, 7: 2072,
-               8: 2073, 9: 2074, 10: 2075, 11: 2076, 12: 2077, 13: 2078},
-    'haima': {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7,
-              8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13},
-    'appchina': {1: 2, 2: 1, 3: 10, 4: 9, 5: 8, 6: 7, 7: 6,
-                 8: 5, 9: 4, 10: 11, 11: 12, 12: 13, 13: 3},
-    'coolpad': {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7,
-                8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13},
 }
 
 PROJECT_NAME = 'wsapp'
 BASE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 LOGS_ROOT = os.path.join(BASE_ROOT, 'logs')
 TEMPLATE_ROOT = os.path.join(BASE_ROOT, 'templates')
-STATIC_ROOT = os.path.join(BASE_ROOT, 'static')
-SCRIPT_ROOT = os.path.join(BASE_ROOT, 'script')
+STATIC_ROOT = os.path.join(BASE_ROOT, 'statics')
+SCRIPT_ROOT = os.path.join(BASE_ROOT, 'scripts')
 # 自动创建日志目录
 if not os.path.exists(LOGS_ROOT):
     os.makedirs(LOGS_ROOT)

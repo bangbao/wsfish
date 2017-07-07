@@ -79,7 +79,7 @@ def upload(req):
     hfile.write(filebody)
     hfile.close()
 
-    done_list = import_file(file_name)
+    done_list = game_config.import_file(file_name)
     msg = 'done: %s' % ', '.join(done_list)
     config_key = done_list[0].lower() if done_list else ''
 

@@ -558,7 +558,7 @@ def get_server_footprint(user_token):
                                              't': timestamp}
 
     token_servers = {}
-    for server_id, obj in game_config.yield_open_servers():
+    for server_id, obj in game_config.servers.iteritems():
         if obj['open_time'] < now:
             uid, level = None, None
             if server_id in footprints:
